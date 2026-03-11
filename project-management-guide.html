@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プロジェクト管理ツール導入ガイド</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface2: #1c1c27;
+            --border: #2a2a3a;
+            --accent-gh: #58a6ff;
+            --accent-linear: #5e6ad2;
+            --accent-notion: #f7c948;
+            --text: #e8e8f0;
+            --text-muted: #7a7a9a;
+            --green: #3fb950;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Sans JP', sans-serif;
+            font-weight: 300;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 80% 20%, rgba(88, 166, 255, 0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 10% 80%, rgba(94, 106, 210, 0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-tag {
+            font-family: 'Syne', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent-gh);
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.2s;
+        }
+
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(40px, 6vw, 80px);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            margin-bottom: 24px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.4s;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--accent-gh), var(--accent-linear));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 560px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.6s;
+        }
+
+        /* ── STRATEGY SECTION ── */
+        .section {
+            padding: 80px 60px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-family: 'Syne', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        /* ── FLOW BAR ── */
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 60px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .flow-step {
+            flex: 1;
+            padding: 24px 28px;
+            position: relative;
+        }
+
+        .flow-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 18px;
+            z-index: 2;
+        }
+
+        .flow-step:not(:last-child) {
+            border-right: 1px solid var(--border);
+        }
+
+        .flow-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .flow-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .flow-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ── TOOL CARDS ── */
+        .tools-grid {
+            display: grid;
+            gap: 2px;
+        }
+
+        .tool-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.3s;
+            margin-bottom: 40px;
+        }
+
+        .tool-card:hover {
+            border-color: var(--accent);
+        }
+
+        .tool-header {
+            padding: 40px 48px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 24px;
+            align-items: start;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tool-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .tool-meta h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .tool-meta p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .tool-badge {
+            font-family: 'Syne', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            padding: 6px 14px;
+            border-radius: 100px;
+            border: 1px solid;
+            white-space: nowrap;
+        }
+
+        /* GitHub */
+        .tool-gh {
+            --accent: var(--accent-gh);
+        }
+
+        .tool-gh .tool-icon {
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--accent-gh);
+        }
+
+        .tool-gh .tool-meta h2 {
+            color: var(--accent-gh);
+        }
+
+        .tool-gh .tool-badge {
+            color: var(--accent-gh);
+            border-color: rgba(88, 166, 255, 0.4);
+            background: rgba(88, 166, 255, 0.08);
+        }
+
+        /* Linear */
+        .tool-linear {
+            --accent: var(--accent-linear);
+        }
+
+        .tool-linear .tool-icon {
+            background: rgba(94, 106, 210, 0.1);
+            color: var(--accent-linear);
+        }
+
+        .tool-linear .tool-meta h2 {
+            color: var(--accent-linear);
+        }
+
+        .tool-linear .tool-badge {
+            color: var(--accent-linear);
+            border-color: rgba(94, 106, 210, 0.4);
+            background: rgba(94, 106, 210, 0.08);
+        }
+
+        /* Notion */
+        .tool-notion {
+            --accent: var(--accent-notion);
+        }
+
+        .tool-notion .tool-icon {
+            background: rgba(247, 201, 72, 0.1);
+            color: var(--accent-notion);
+        }
+
+        .tool-notion .tool-meta h2 {
+            color: var(--accent-notion);
+        }
+
+        .tool-notion .tool-badge {
+            color: var(--accent-notion);
+            border-color: rgba(247, 201, 72, 0.4);
+            background: rgba(247, 201, 72, 0.08);
+        }
+
+        .tool-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .tool-section {
+            padding: 36px 48px;
+        }
+
+        .tool-section:first-child {
+            border-right: 1px solid var(--border);
+        }
+
+        .tool-section h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        /* Steps */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .step {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .step-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-content strong {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .step-content span {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Code block */
+        .code-block {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--green);
+            margin-top: 12px;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .code-comment {
+            color: var(--text-muted);
+        }
+
+        /* Tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        /* Tips list */
+        .tips {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tip {
+            display: flex;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .tip::before {
+            content: '✦';
+            color: var(--accent);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* ── COMPARISON TABLE ── */
+        .table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: var(--surface2);
+        }
+
+        th {
+            padding: 18px 24px;
+            text-align: left;
+            font-family: 'Syne', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: var(--surface2);
+        }
+
+        .td-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .score {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .dot.on {
+            background: var(--accent);
+        }
+
+        /* ── GITHUB PUSH GUIDE ── */
+        .push-guide {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .push-guide-header {
+            padding: 28px 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .push-guide-header h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .terminal {
+            padding: 32px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .cmd {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .prompt {
+            color: var(--green);
+            flex-shrink: 0;
+        }
+
+        .cmd-text {
+            color: var(--text);
+        }
+
+        .cmd-comment {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            padding: 40px 60px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            .hero,
+            .section {
+                padding: 60px 24px;
+            }
+
+            .tool-header {
+                grid-template-columns: auto 1fr;
+            }
+
+            .tool-badge {
+                display: none;
+            }
+
+            .tool-body {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-section:first-child {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .flow {
+                flex-direction: column;
+            }
+
+            .flow-step:not(:last-child) {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .flow-step:not(:last-child)::after {
+                content: '↓';
+                right: auto;
+                top: auto;
+                bottom: -14px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            footer {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-tag">Project Management Guide · 2025</div>
+        <h1>管理ツール<br><span>導入ガイド</span></h1>
+        <p class="hero-sub">GitHub Copilot を軸とした開発チームのための、3つのプロジェクト管理ツール比較と導入手順。スクラム・カンバンどちらにも対応。</p>
+    </section>
+
+    <!-- STRATEGY -->
+    <div class="section">
+        <div class="section-label">進め方の戦略</div>
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-num">PHASE 01</div>
+                <div class="flow-title">スクラム</div>
+                <div class="flow-desc">スプリント単位で開発。<br>イベント（計画・レビュー等）を定期実施</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">PHASE 02</div>
+                <div class="flow-title">カンバン</div>
+                <div class="flow-desc">兼任が増えたら移行。<br>WIP制限でフロー管理</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">PHASE 03</div>
+                <div class="flow-title">柔軟対応</div>
+                <div class="flow-desc">さらに負荷が高まれば<br>非同期・非定型に切り替え</div>
+            </div>
+        </div>
+
+        <!-- ━━ GITHUB PROJECTS ━━ -->
+        <div class="tool-card tool-gh">
+            <div class="tool-header">
+                <div class="tool-icon">⊙</div>
+                <div class="tool-meta">
+                    <h2>GitHub Projects</h2>
+                    <p>GitHub ネイティブの統合型プロジェクト管理。Issue・PR・Copilot と同一エコシステムで完結。</p>
+                </div>
+                <div class="tool-badge">🥇 推奨 · 無料</div>
+            </div>
+            <div class="tool-body">
+                <div class="tool-section">
+                    <h3>導入ステップ</h3>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-num">1</div>
+                            <div class="step-content">
+                                <strong>リポジトリにProjectsを作成</strong>
+                                <span>GitHub リポジトリ → "Projects" タブ → "New project" → テンプレートから <em>Scrum</em> または
+                                    <em>Kanban</em> を選択</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">2</div>
+                            <div class="step-content">
+                                <strong>IssueをProjectに紐付け</strong>
+                                <span>Issue 作成時に右サイドバーの "Projects" からアサイン。ラベルで Story / Task / Bug を分類する</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">3</div>
+                            <div class="step-content">
+                                <strong>スプリントフィールドを追加</strong>
+                                <span>"+ Add field" → "Iteration" でスプリント期間を設定（例：2週間）。バックログから対象Issueをアサイン</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">4</div>
+                            <div class="step-content">
+                                <strong>Copilot と連携</strong>
+                                <span>Issue に要件を書き込み → Copilot Chat で <code>#issue-番号</code> を参照して実装指示を出す</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">5</div>
+                            <div class="step-content">
+                                <strong>カンバンへの移行</strong>
+                                <span>"View" を追加 → "Board" レイアウトに切り替えるだけ。データはそのまま引き継がれる</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <h3>Copilot 連携のポイント</h3>
+                    <div class="tips">
+                        <div class="tip">Issue のタイトル・本文を構造化して書く（背景 / 受け入れ条件 / タスク）と Copilot が参照しやすい</div>
+                        <div class="tip">PR を作成すると Copilot がコードレビューを自動実行し、該当 Issue に結果を紐付けられる</div>
+                        <div class="tip">GitHub Actions でスプリント終了時に未完了 Issue を自動で次スプリントへ移動するワークフローを組める</div>
+                        <div class="tip">Codespaces から直接 Issue を開き、ブランチ作成～コミット～PR まで一気通貫で完結する</div>
+                    </div>
+                    <div style="margin-top: 24px;">
+                        <h3>向いているケース</h3>
+                        <div class="tags" style="margin-top: 12px;">
+                            <span class="tag">追加コストゼロ</span>
+                            <span class="tag">GitHub メイン開発</span>
+                            <span class="tag">小規模スタート</span>
+                            <span class="tag">段階的スクラム</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ━━ LINEAR ━━ -->
+        <div class="tool-card tool-linear">
+            <div class="tool-header">
+                <div class="tool-icon">◈</div>
+                <div class="tool-meta">
+                    <h2>Linear</h2>
+                    <p>開発者ファーストの高速プロジェクト管理。スプリント（Cycles）とカンバンを柔軟に切り替え可能。</p>
+                </div>
+                <div class="tool-badge">🥈 次点 · 無料〜</div>
+            </div>
+            <div class="tool-body">
+                <div class="tool-section">
+                    <h3>導入ステップ</h3>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-num">1</div>
+                            <div class="step-content">
+                                <strong>アカウント作成・ワークスペース設定</strong>
+                                <span>linear.app にアクセス → "Start for free" → チーム名・メンバーを追加（無料は最大メンバー数制限あり）</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">2</div>
+                            <div class="step-content">
+                                <strong>GitHub 連携を有効化</strong>
+                                <span>Settings → Integrations → GitHub → リポジトリを選択。PR 作成時に Issue が自動で "In Progress"
+                                    へ移動する</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">3</div>
+                            <div class="step-content">
+                                <strong>Cycles（スプリント）を設定</strong>
+                                <span>Team Settings → Cycles → ON にして期間を設定。Issues をドラッグして Current Cycle にアサイン</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">4</div>
+                            <div class="step-content">
+                                <strong>カンバンへの移行</strong>
+                                <span>Cycles を OFF → "Board" ビューに切り替え。WIP 制限をステータスごとに設定してフロー管理</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">5</div>
+                            <div class="step-content">
+                                <strong>Copilot との連携</strong>
+                                <span>Linear Issue URL を Copilot Chat に貼り付けると内容を参照可能。PR タイトルに <code>LIN-123</code>
+                                    を含めると自動紐付け</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <h3>Linear ならではの強み</h3>
+                    <div class="tips">
+                        <div class="tip">キーボードショートカットが充実しており、Issue 作成・移動がマウスなしで完結。開発中に素早く記録できる</div>
+                        <div class="tip">バーンダウンチャート・ベロシティ・サイクルタイムが自動で計算され、スクラムイベントに使いやすい</div>
+                        <div class="tip">Slack 連携が優秀で、Issue の更新を特定チャンネルに通知でき、非同期コミュニケーションと相性が良い</div>
+                        <div class="tip">Sub-issues でタスクの階層構造を作れるため、エピック → ストーリー → タスクの粒度管理がしやすい</div>
+                    </div>
+                    <div style="margin-top: 24px;">
+                        <h3>向いているケース</h3>
+                        <div class="tags" style="margin-top: 12px;">
+                            <span class="tag">本格スクラム管理</span>
+                            <span class="tag">速度重視</span>
+                            <span class="tag">メトリクス確認</span>
+                            <span class="tag">Slack 連携</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ━━ NOTION ━━ -->
+        <div class="tool-card tool-notion">
+            <div class="tool-header">
+                <div class="tool-icon">◻</div>
+                <div class="tool-meta">
+                    <h2>Notion</h2>
+                    <p>ドキュメント・仕様書・タスクを一元管理。設計書・議事録・タスクをひとつの場所に集約できる。</p>
+                </div>
+                <div class="tool-badge">🥉 予備案 · 無料〜</div>
+            </div>
+            <div class="tool-body">
+                <div class="tool-section">
+                    <h3>導入ステップ</h3>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-num">1</div>
+                            <div class="step-content">
+                                <strong>ワークスペース作成</strong>
+                                <span>notion.so → "Get started free" → チームワークスペースを作成。テンプレートギャラリーから "Engineering Wiki"
+                                    を使うと楽</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">2</div>
+                            <div class="step-content">
+                                <strong>スプリントデータベースを構築</strong>
+                                <span>新規ページ → "Database" → "Board" ビューを選択。ステータス（Backlog / Todo / In Progress /
+                                    Done）を設定</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">3</div>
+                            <div class="step-content">
+                                <strong>GitHub 連携（GitHub Embed）</strong>
+                                <span>Notion ページ内で <code>/github</code> と入力 → リポジトリの PR・Issue をブロックとして埋め込む</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">4</div>
+                            <div class="step-content">
+                                <strong>仕様書とタスクをリンク</strong>
+                                <span>"Relation" プロパティを使い、仕様書ページとタスクカードを双方向リンク。Copilot の参照ソースにもなる</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">5</div>
+                            <div class="step-content">
+                                <strong>カンバンへの切り替え</strong>
+                                <span>既存データベースのビューを "Board" に追加するだけ。スプリントフィールドをフィルターして表示を切り替える</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <h3>Notion ならではの強み</h3>
+                    <div class="tips">
+                        <div class="tip">設計書・API 仕様・議事録・タスクが一箇所にまとまり、Copilot に渡すコンテキストとして活用できる</div>
+                        <div class="tip">Notion AI を使えばタスクの説明文を自動生成したり、議事録からアクションアイテムを抽出できる</div>
+                        <div class="tip">フリープランでも基本機能が使える。チーム全員が同じページを編集できるリアルタイムコラボが便利</div>
+                        <div class="tip">プロジェクト初期の要件定義フェーズは Notion → 開発フェーズは GitHub Projects という使い分けも有効</div>
+                    </div>
+                    <div style="margin-top: 24px;">
+                        <h3>向いているケース</h3>
+                        <div class="tags" style="margin-top: 12px;">
+                            <span class="tag">ドキュメント重視</span>
+                            <span class="tag">仕様書管理</span>
+                            <span class="tag">議事録一元化</span>
+                            <span class="tag">要件定義フェーズ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ━━ COMPARISON ━━ -->
+        <div class="section-label" style="margin-top: 20px;">比較表</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ツール</th>
+                        <th>GitHub連携</th>
+                        <th>スクラム</th>
+                        <th>カンバン</th>
+                        <th>コスト</th>
+                        <th>導入難易度</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="td-name" style="color: var(--accent-gh);">GitHub Projects</td>
+                        <td>
+                            <div class="score" style="--accent: var(--accent-gh);">
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="score" style="--accent: var(--accent-gh);">
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="score" style="--accent: var(--accent-gh);">
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </td>
+                        <td style="color: var(--green); font-size: 13px; font-weight: 500;">無料</td>
+                        <td style="font-size: 13px; color: var(--text-muted);">低</td>
+                    </tr>
+                    <tr>
+                        <td class="td-name" style="color: var(--accent-linear);">Linear</td>
+                        <td>
+                            <div class="score" style="--accent: var(--accent-linear);">
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="score" style="--accent: var(--accent-linear);">
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="score" style="--accent: var(--accent-linear);">
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                            </div>
+                        </td>
+                        <td style="font-size: 13px; color: var(--text-muted);">無料〜$8/人</td>
+                        <td style="font-size: 13px; color: var(--text-muted);">低〜中</td>
+                    </tr>
+                    <tr>
+                        <td class="td-name" style="color: var(--accent-notion);">Notion</td>
+                        <td>
+                            <div class="score" style="--accent: var(--accent-notion);">
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="score" style="--accent: var(--accent-notion);">
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="score" style="--accent: var(--accent-notion);">
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot on"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </td>
+                        <td style="font-size: 13px; color: var(--text-muted);">無料〜$10/人</td>
+                        <td style="font-size: 13px; color: var(--text-muted);">中</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ━━ PUSH GUIDE ━━ -->
+        <div class="section-label" style="margin-top: 20px;">このファイルを GitHub にプッシュする手順</div>
+        <div class="push-guide">
+            <div class="push-guide-header">
+                <span style="font-size: 20px;">⌨</span>
+                <h2>Git コマンド手順</h2>
+            </div>
+            <div class="terminal">
+                <div class="cmd">
+                    <span class="prompt">$</span>
+                    <span class="cmd-text">mkdir my-project &amp;&amp; cd my-project</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt"></span>
+                    <span class="cmd-comment"># プロジェクトフォルダを作成</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt">$</span>
+                    <span class="cmd-text">git init</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt"></span>
+                    <span class="cmd-comment"># Git リポジトリを初期化</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt">$</span>
+                    <span class="cmd-text">cp /path/to/project-management-guide.html .</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt"></span>
+                    <span class="cmd-comment"># ダウンロードしたHTMLをフォルダにコピー</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt">$</span>
+                    <span class="cmd-text">git add project-management-guide.html</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt">$</span>
+                    <span class="cmd-text">git commit -m "docs: add project management tool guide"</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt"></span>
+                    <span class="cmd-comment"># GitHub でリポジトリを新規作成してから以下を実行</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt">$</span>
+                    <span class="cmd-text">git remote add origin https://github.com/<span
+                            style="color: var(--accent-gh);">YOUR_USERNAME</span>/<span
+                            style="color: var(--accent-gh);">YOUR_REPO</span>.git</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt">$</span>
+                    <span class="cmd-text">git branch -M main</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt">$</span>
+                    <span class="cmd-text">git push -u origin main</span>
+                </div>
+                <div class="cmd">
+                    <span class="prompt"></span>
+                    <span class="cmd-comment"># GitHub Pages で公開する場合は Settings → Pages → main ブランチを選択</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <span>Project Management Guide · 2025</span>
+        <span>GitHub Projects / Linear / Notion</span>
+    </footer>
+
+</body>
+
+</html>
