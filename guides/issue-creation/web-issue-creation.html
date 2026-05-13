@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEB画面で Issue を作成 - GitHub Issue 作成ガイド</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f5f5f5;
+            --surface2: #eeeeee;
+            --border: #e0e0e0;
+            --accent-gh: #0969da;
+            --accent-linear: #6366f1;
+            --accent-notion: #f59e0b;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --green: #059669;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Sans JP', sans-serif;
+            font-weight: 300;
+            line-height: 1.7;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .back-link {
+            color: var(--accent-gh);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-linear);
+        }
+
+        /* ── CONTAINER ── */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 60px;
+            line-height: 1.8;
+        }
+
+        /* ── SECTION ── */
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--accent-gh);
+            color: var(--text);
+        }
+
+        /* ── STEPS ── */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .step {
+            background: var(--surface);
+            border-left: 4px solid var(--accent-gh);
+            padding: 25px;
+            border-radius: 8px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .step:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .step-number {
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-gh);
+            margin-bottom: 8px;
+        }
+
+        .step-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .step-detail {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .step-action {
+            background: white;
+            border: 2px solid var(--accent-gh);
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 13px;
+            color: var(--accent-gh);
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .tip-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--accent-notion);
+            padding: 20px;
+            margin-top: 15px;
+            border-radius: 6px;
+        }
+
+        .tip-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-notion);
+            margin-bottom: 8px;
+        }
+
+        .tip-text {
+            font-size: 13px;
+            color: #92400e;
+            line-height: 1.6;
+        }
+
+        /* ── CODE BLOCK ── */
+        .code-block {
+            background: var(--text);
+            color: #e0e0e0;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        /* ── IMPORTANT BOX ── */
+        .important-box {
+            background: #fee2e2;
+            border-left: 4px solid var(--accent-gh);
+            padding: 20px;
+            margin-top: 15px;
+            border-radius: 6px;
+        }
+
+        .important-text {
+            font-size: 13px;
+            color: #7f1d1d;
+            line-height: 1.6;
+        }
+
+        /* ── CHECKLIST ── */
+        .checklist {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .checklist-item {
+            display: flex;
+            gap: 12px;
+            margin: 10px 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .checklist-item input {
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 40px 60px;
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 900px;
+            margin: 0 auto;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .page-title {
+                font-size: 28px;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+
+            header {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-title">WEB画面で Issue を作成</div>
+            <a href="web-method.html" class="back-link">← WEB 画面の選択に戻る</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="page-title">WEB 画面での Issue 作成ガイド</h1>
+        <p class="page-subtitle">GitHub の WEB 画面を使って、Copilot の指示の下で Issue を作成する手順を、初心者向けに詳しく説明します。</p>
+
+        <!-- セクション1：準備 -->
+        <section class="section">
+            <h2 class="section-title">準備：事前確認</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">準備 1</div>
+                    <div class="step-title">GitHub にログインしているか確認</div>
+                    <div class="step-detail">
+                        GitHub の Issue を作成するには、GitHub アカウントにログインしている必要があります。
+                    </div>
+                    <div class="step-action">
+                        ブラウザで https://github.com にアクセスして、右上にあなたのアバター画像が表示されていることを確認してください。
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-label">💡 Tips</div>
+                        <div class="tip-text">
+                            未ログインの場合は「Sign in」ボタンをクリックしてログインしてください。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">準備 2</div>
+                    <div class="step-title">リポジトリ URL を確認</div>
+                    <div class="step-detail">
+                        Issue を作成するリポジトリの URL を確認します。
+                    </div>
+                    <div class="step-action">
+                        Copilot に「このリポジトリのURLを確認してください」と指示
+                    </div>
+                    <div class="code-block">このリポジトリのURL確認してください</div>
+                    <div class="tip-box">
+                        <div class="tip-label">💡 Tips</div>
+                        <div class="tip-text">
+                            Copilot が実行するコマンド：git remote -v
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- セクション2：Issue 作成ページを開く -->
+        <section class="section">
+            <h2 class="section-title">Step 1：Issue 作成ページを開く</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">Step 1</div>
+                    <div class="step-title">Copilot に Issue 作成ページを開くよう指示</div>
+                    <div class="step-detail">
+                        Copilot に以下の指示を出します。これにより Copilot がリポジトリの Issue 作成ページを自動的に開きます。
+                    </div>
+                    <div class="step-action">
+                        GitHub の Issue 作成ページ（https://github.com/[owner]/[repo]/issues/new）をブラウザで開いてください
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-label">💡 何が起こるか</div>
+                        <div class="tip-text">
+                            Copilot がリポジトリの URL を認識して、自動的にブラウザで Issue 作成ページにアクセスします。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">確認</div>
+                    <div class="step-title">ページが開いたことを確認</div>
+                    <div class="step-detail">
+                        「Create new issue」というタイトルのページが表示されていますか？
+                    </div>
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <input type="checkbox">
+                            「Add a title」というテキストボックスが見える
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox">
+                            「Type your description here…」というテキストエリアが見える
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox">
+                            右下に「Create」ボタンが見える
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- セクション3：タイトルを入力 -->
+        <section class="section">
+            <h2 class="section-title">Step 2：タイトルを入力</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">Step 2</div>
+                    <div class="step-title">Copilot にタイトル入力を指示</div>
+                    <div class="step-detail">
+                        Copilot に「Add a title」欄に Issue のタイトルを入力するよう指示します。
+                    </div>
+                    <div class="step-action">
+                        「Add a title」というテキストボックスに「copilot test issue」と入力してください
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-label">💡 何が起こるか</div>
+                        <div class="tip-text">
+                            Copilot がタイトル欄をクリックして、「copilot test issue」と入力します。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">確認</div>
+                    <div class="step-title">タイトルが入力されたことを確認</div>
+                    <div class="step-detail">
+                        「Add a title」欄に「copilot test issue」が表示されていますか？
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- セクション4：説明を入力 -->
+        <section class="section">
+            <h2 class="section-title">Step 3：説明を入力</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">Step 3</div>
+                    <div class="step-title">Copilot に説明文入力を指示</div>
+                    <div class="step-detail">
+                        次に、Issue の説明文をテキストエリアに入力するよう指示します。
+                    </div>
+                    <div class="step-action">
+                        「Type your description here…」というテキストエリアに「追加成功しました」と入力してください
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-label">💡 何が起こるか</div>
+                        <div class="tip-text">
+                            Copilot が説明欄をクリックして、「追加成功しました」と入力します。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">確認</div>
+                    <div class="step-title">説明文が入力されたことを確認</div>
+                    <div class="step-detail">
+                        テキストエリアに「追加成功しました」が表示されていますか？
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- セクション5：Issue を作成 -->
+        <section class="section">
+            <h2 class="section-title">Step 4：Issue を作成</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">Step 4</div>
+                    <div class="step-title">Copilot に Create ボタンをクリックするよう指示</div>
+                    <div class="step-detail">
+                        タイトルと説明文を入力したら、「Create」ボタンをクリックして Issue を作成します。
+                    </div>
+                    <div class="step-action">
+                        右下の「Create」ボタンをクリックして Issue を作成してください
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-label">💡 何が起こるか</div>
+                        <div class="tip-text">
+                            Copilot が「Create」ボタンをクリックして、Issue が作成されます。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">確認</div>
+                    <div class="step-title">Issue が作成されたことを確認</div>
+                    <div class="step-detail">
+                        ページが Issue の詳細ページにリダイレクトされ、作成した Issue が表示されていますか？
+                    </div>
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <input type="checkbox">
+                            タイトルが「copilot test issue」と表示されている
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox">
+                            説明文が「追加成功しました」と表示されている
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox">
+                            Issue 番号（例：#5）が表示されている
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- セクション6：トラブルシューティング -->
+        <section class="section">
+            <h2 class="section-title">トラブルシューティング</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-title">❌ 問題：Issue 作成ページが開かない</div>
+                    <div class="step-detail">
+                        GitHub にログインしていない可能性があります。
+                    </div>
+                    <div class="important-box">
+                        <div class="important-text">
+                            → ブラウザで https://github.com にアクセスして、ログインしてから再度指示してください。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">❌ 問題：テキストが入力されない</div>
+                    <div class="step-detail">
+                        テキストボックスが正しく認識されていない可能性があります。
+                    </div>
+                    <div class="important-box">
+                        <div class="important-text">
+                            → Copilot に「ページを再度開いてから、テキストボックスをクリックして入力してください」と指示してください。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">❌ 問題：Create ボタンが見つからない</div>
+                    <div class="step-detail">
+                        ページが完全に読み込まれていない可能性があります。
+                    </div>
+                    <div class="important-box">
+                        <div class="important-text">
+                            → ページを下にスクロールして、Create ボタンを探してください。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>GitHub Issue 作成ガイド | WEB画面での作成手順</p>
+        </div>
+    </footer>
+</body>
+
+</html>
