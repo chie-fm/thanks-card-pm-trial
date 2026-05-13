@@ -126,7 +126,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
             gap: 40px;
-            margin-bottom: 80px;
+            margin-bottom: 50px;
         }
 
         .method-card {
@@ -201,6 +201,93 @@
 
         .method-cta:hover {
             background: #0860ca;
+        }
+
+        /* ── BREAKDOWN CARD ── */
+        .breakdown-card {
+            background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%);
+            border: 2px solid #6366f1;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 80px;
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .breakdown-card-icon {
+            font-size: 56px;
+            flex-shrink: 0;
+        }
+
+        .breakdown-card-body {
+            flex: 1;
+        }
+
+        .breakdown-card-badge {
+            display: inline-block;
+            background: #6366f1;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        .breakdown-card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .breakdown-card-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .breakdown-card-policy {
+            background: white;
+            border-left: 4px solid #6366f1;
+            padding: 12px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: var(--text);
+            margin-bottom: 20px;
+        }
+
+        .breakdown-card-policy strong {
+            color: #6366f1;
+        }
+
+        .breakdown-card-cta {
+            display: inline-block;
+            background: #6366f1;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .breakdown-card-cta:hover {
+            background: #4f46e5;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .breakdown-card {
+                flex-direction: column;
+                gap: 20px;
+            }
         }
 
         /* ── INFO SECTION ── */
@@ -349,6 +436,30 @@
                 </ul>
                 <div class="method-cta">詳細な手順を見る →</div>
             </a>
+        </div>
+
+        <!-- BREAKDOWN SECTION -->
+        <div class="breakdown-card">
+            <div class="breakdown-card-icon">🤖</div>
+            <div class="breakdown-card-body">
+                <div class="breakdown-card-badge">推奨ワークフロー</div>
+                <h3 class="breakdown-card-title">Issue の細分化も Copilot に任せる</h3>
+                <p class="breakdown-card-desc">
+                    親 Issue を入力するだけで、Copilot が Sub-issue を自動提案・作成します。<br>
+                    生成される各 Sub-issue は <strong>Copilot が実装できる粒度</strong>で本文が書かれるため、そのまま開発に使えます。
+                </p>
+                <div class="breakdown-card-policy">
+                    <strong>📌 作成方針:</strong> Issue の細分化も Copilot に任せる<br>
+                    ジェネレーターに技術スタック・実装アプローチを入力 → Copilot が Sub-issue 本文を自動生成 → CLI コマンドで一括登録
+                </div>
+                <ul class="method-features" style="margin-bottom: 20px;">
+                    <li>ジェネレーターで情報を入力するだけ（フォームはブラウザに自動保存）</li>
+                    <li>Copilot が実装可能な粒度で Sub-issue 本文を生成</li>
+                    <li>技術スタック・参照ファイル・テスト方針まで含めて出力</li>
+                    <li>差分管理・Close ワークフローにも対応</li>
+                </ul>
+                <a href="issue-breakdown-policy.html" class="breakdown-card-cta">⚙️ Issue 細分化 実装方針を見る →</a>
+            </div>
         </div>
 
         <!-- INFO SECTION -->

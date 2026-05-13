@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue 細分化ジェネレーター - Copilot 対応</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f5f5f5;
+            --surface2: #eeeeee;
+            --border: #e0e0e0;
+            --accent-gh: #0969da;
+            --accent-linear: #6366f1;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --green: #059669;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Sans JP', sans-serif;
+            font-weight: 300;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+            padding: 60px 40px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* ── CONTAINER ── */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ── SECTION ── */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ── FORM ITEMS ── */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Noto Sans JP', monospace;
+            font-size: 14px;
+            background: var(--bg);
+            color: var(--text);
+            transition: border-color 0.3s;
+        }
+
+        .form-group textarea {
+            min-height: 88px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="number"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-gh);
+            box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
+        }
+
+        /* ── CHECKBOXES ── */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover {
+            background-color: var(--surface);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .checkbox-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ── BUTTONS ── */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--accent-gh);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #0860ca;
+            box-shadow: 0 4px 12px rgba(9, 105, 218, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface2);
+            border-color: var(--text-muted);
+        }
+
+        /* ── OUTPUT SECTION ── */
+        .output-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .output-section.active {
+            display: block;
+        }
+
+        .output-section h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .output-content {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text);
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+
+        .copy-btn {
+            background: var(--green);
+            color: white;
+        }
+
+        .copy-btn:hover {
+            background: #047857;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        }
+
+        .copy-btn.copied {
+            background: #059669;
+        }
+
+        /* ── TIP BOX ── */
+        .tip-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-top: 16px;
+            font-size: 13px;
+        }
+
+        .tip-box strong {
+            color: #b45309;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--surface);
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            header {
+                padding: 40px 20px;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .output-content {
+                font-size: 12px;
+            }
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border-left: 4px solid #dc2626;
+            padding: 12px 16px;
+            border-radius: 4px;
+            color: #991b1b;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .field-error input,
+        .field-error textarea,
+        .field-error input:focus,
+        .field-error textarea:focus {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+            background: #fff8f8 !important;
+        }
+
+        .field-error-msg {
+            color: #dc2626;
+            font-size: 12px;
+            margin-top: 6px;
+            display: block;
+        }
+
+        .field-error .checkbox-group {
+            border: 2px solid #dc2626;
+            border-radius: 8px;
+            padding: 8px;
+            background: #fff8f8;
+        }
+
+        .required-mark {
+            color: #dc2626;
+            margin-left: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav style="text-align: left; margin-bottom: 20px; font-size: 13px; color: var(--text-muted);">
+            <a href="issue-creation-guide.html" style="color: var(--accent-gh); text-decoration: none;">TOPガイド</a>
+            <span style="margin: 0 8px;">›</span>
+            <a href="issue-breakdown-policy.html"
+                style="color: var(--accent-gh); text-decoration: none;">Issue細分化実装方針</a>
+            <span style="margin: 0 8px;">›</span>
+            <span>ジェネレーター</span>
+        </nav>
+        <h1>⚙️ Issue 細分化ジェネレーター</h1>
+        <p>Issue を入力して「生成」をクリック → Copilot に貼り付け可能なテキストを作成</p>
+    </header>
+
+    <div class="container">
+        <!-- INPUT SECTION -->
+        <div class="section">
+            <h2>📝 入力</h2>
+
+            <div class="form-group" id="fg-issueNumber">
+                <label for="issueNumber">親 Issue 番号<span class="required-mark">*必須</span></label>
+                <input type="number" id="issueNumber" placeholder="例: 6" min="1" value="">
+            </div>
+
+            <div class="form-group" id="fg-issueGoal">
+                <label for="issueGoal">目的<span class="required-mark">*必須</span></label>
+                <textarea id="issueGoal" placeholder="例: 初期リリースに向けて、ユーザー登録機能を実装する"></textarea>
+            </div>
+
+            <div class="form-group" id="fg-issueBackground">
+                <label for="issueBackground">背景・課題<span class="required-mark">*必須</span></label>
+                <textarea id="issueBackground" placeholder="例: 現状は手動登録のみで、運用コストが高い"></textarea>
+            </div>
+
+            <div class="form-group" id="fg-scopeIn">
+                <label for="scopeIn">対象範囲（やること）<span class="required-mark">*必須</span></label>
+                <textarea id="scopeIn" placeholder="例: 画面実装、API実装、テスト"></textarea>
+            </div>
+
+            <div class="form-group" id="fg-scopeOut">
+                <label for="scopeOut">対象外（やらないこと）</label>
+                <textarea id="scopeOut" placeholder="例: ソーシャルログイン対応は今回対象外"></textarea>
+            </div>
+
+            <div class="form-group" id="fg-doneCriteria">
+                <label for="doneCriteria">完了条件<span class="required-mark">*必須</span></label>
+                <textarea id="doneCriteria" placeholder="例: E2Eテストが通り、ステージングで動作確認できる"></textarea>
+            </div>
+
+            <div class="form-group" id="fg-constraints">
+                <label for="constraints">制約・注意点</label>
+                <textarea id="constraints" placeholder="例: 既存API仕様を変更しない、今週中に完了"></textarea>
+            </div>
+
+            <div class="form-group" id="fg-techStack">
+                <label for="techStack">技術スタック<span class="required-mark">*必須</span></label>
+                <input type="text" id="techStack" placeholder="例: TypeScript, React, Next.js, PostgreSQL">
+            </div>
+
+            <div class="form-group" id="fg-relatedFiles">
+                <label for="relatedFiles">参照ファイル・関連コード（任意・1行1件）</label>
+                <textarea id="relatedFiles"
+                    placeholder="例: src/components/Form.tsx&#10;api/routes/user.ts&#10;prisma/schema.prisma"></textarea>
+            </div>
+
+            <div class="form-group" id="fg-implApproach">
+                <label for="implApproach">実装アプローチ<span class="required-mark">*必須</span></label>
+                <textarea id="implApproach"
+                    placeholder="例: 既存のFormコンポーネントを拡張して実装する。バリデーションはzodを使用。DBはPrismaで操作。"></textarea>
+            </div>
+
+            <div class="form-group" id="fg-testPolicy">
+                <label for="testPolicy">テスト方針<span class="required-mark">*必須</span></label>
+                <textarea id="testPolicy" placeholder="例: JestでAPIユニットテスト、Playwrightで画面E2Eテストを実施"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="currentSubIssues">差分管理用: 現在の Sub-issue 一覧（任意・1行1件）</label>
+                <textarea id="currentSubIssues" placeholder="例: #7 Sub-task: 機能A&#10;#8 Sub-task: 機能C"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="expectedSubIssues">差分管理用: 新しい期待リスト（任意・1行1件）</label>
+                <textarea id="expectedSubIssues" placeholder="例: Sub-task: 機能A（継続）&#10;Sub-task: 機能B（新規）"></textarea>
+            </div>
+
+            <div class="form-group" id="fg-concepts">
+                <label>細分化の観点（複数選択可）<span class="required-mark">*必須</span></label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="分割-機能別" value="機能別分解">
+                        <div>
+                            <div class="checkbox-label">機能別分解</div>
+                            <div class="checkbox-desc">実装機能ごとに分割</div>
+                        </div>
+                    </label>
+
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="分割-フェーズ別" value="フェーズ別分解">
+                        <div>
+                            <div class="checkbox-label">フェーズ別分解</div>
+                            <div class="checkbox-desc">フェーズごとに分割（設計→実装→テスト）</div>
+                        </div>
+                    </label>
+
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="分割-優先度別" value="優先度別分解">
+                        <div>
+                            <div class="checkbox-label">優先度別分解</div>
+                            <div class="checkbox-desc">優先度順に分割</div>
+                        </div>
+                    </label>
+
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="分割-担当者別" value="担当者別分解">
+                        <div>
+                            <div class="checkbox-label">担当者別分解</div>
+                            <div class="checkbox-desc">担当者ごとに分割</div>
+                        </div>
+                    </label>
+
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="分割-その他" value="カスタム分解">
+                        <div>
+                            <div class="checkbox-label">その他（カスタム）</div>
+                            <div class="checkbox-desc">独自の観点を指定</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group" id="customInput" style="display: none;">
+                <label for="customConcept">カスタム観点</label>
+                <input type="text" id="customConcept" placeholder="例: 環境別分解、チーム別分解など">
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="generatePrompt()">✨ 生成</button>
+                <button class="btn-secondary" onclick="clearForm()">🔄 リセット</button>
+            </div>
+        </div>
+
+        <!-- OUTPUT SECTION -->
+        <div class="section">
+            <div class="output-section" id="outputSection">
+                <h3>📋 そのまま保存できる MD 本文</h3>
+                <div id="errorMessage"></div>
+
+                <h3 style="margin-top: 18px;">📝 提案MDファイル名</h3>
+                <div class="output-content" id="suggestedFilename" style="max-height: none;"></div>
+                <button class="btn-secondary" id="copyFilenameBtn"
+                    onclick="copyById('suggestedFilename', 'copyFilenameBtn')">📋 ファイル名をコピー</button>
+
+                <h3 style="margin-top: 18px;">🚀 実行指示用本文（Copilot貼り付け用）</h3>
+                <div class="output-content" id="executionPrompt"></div>
+                <button class="btn-secondary" id="copyExecutionBtn"
+                    onclick="copyById('executionPrompt', 'copyExecutionBtn')">📋 実行本文をコピー</button>
+
+                <h3 style="margin-top: 18px;">📄 完全なMD本文</h3>
+                <div class="output-content" id="outputContent"></div>
+                <button class="btn-secondary copy-btn" onclick="copyToClipboard()">📋 コピー</button>
+                <div class="tip-box">
+                    <strong>💡 次のステップ</strong><br>
+                    2) その中の「Copilot への指示（実行用）」をチャットに貼り付けて実行します。
+                </div>
+            </div>
+        </div>
+
+        <!-- HELP SECTION -->
+        <div class="section">
+            <h2>❓ 使い方</h2>
+            <div style="background: var(--surface); padding: 20px; border-radius: 8px; line-height: 1.8;">
+                <p><strong>Step 1:</strong> 親 Issue 番号と細分化の観点を選択します</p>
+                <p><strong>Step 1.5:</strong> 親Issueに情報が足りない場合は補足情報を入力します</p>
+                <p><strong>Step 2:</strong> 「生成」ボタンをクリック（完全なMD本文を生成）</p>
+                <p><strong>Step 3:</strong> 表示された本文を「コピー」ボタンでコピー</p>
+                <p><strong>Step 4:</strong> そのまま .md ファイルとして貼り付け・保存</p>
+                <p><strong>Step 5:</strong> MD内の「Copilot への指示（実行用）」をCopilotに貼り付け</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Issue 細分化ジェネレーター | GitHub CLI + Copilot 対応 | 2026-05-13</p>
+    </footer>
+
+    <script>
+        // カスタム観点の入力欄を表示/隐藏
+        document.getElementById('分割-その他').addEventListener('change', function () {
+            document.getElementById('customInput').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // テキスト生成関数
+        function generatePrompt() {
+            const issueNumber = document.getElementById('issueNumber').value.trim();
+            const issueGoal = document.getElementById('issueGoal').value.trim();
+            const issueBackground = document.getElementById('issueBackground').value.trim();
+            const scopeIn = document.getElementById('scopeIn').value.trim();
+            const scopeOut = document.getElementById('scopeOut').value.trim();
+            const doneCriteria = document.getElementById('doneCriteria').value.trim();
+            const constraints = document.getElementById('constraints').value.trim();
+            const techStack = document.getElementById('techStack').value.trim();
+            const relatedFiles = document.getElementById('relatedFiles').value.trim();
+            const implApproach = document.getElementById('implApproach').value.trim();
+            const testPolicy = document.getElementById('testPolicy').value.trim();
+            const currentSubIssues = document.getElementById('currentSubIssues').value.trim();
+            const expectedSubIssues = document.getElementById('expectedSubIssues').value.trim();
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = '';
+
+            // 全フォームグループのエラー状態をリセット
+            document.querySelectorAll('.form-group').forEach(fg => {
+                fg.classList.remove('field-error');
+                const msg = fg.querySelector('.field-error-msg');
+                if (msg) msg.remove();
+            });
+
+            // 必須フィールドの定義 [fieldId, formGroupId, エラーメッセージ]
+            const requiredFields = [
+                ['issueNumber', 'fg-issueNumber', '親 Issue 番号を入力してください'],
+                ['issueGoal', 'fg-issueGoal', '目的を入力してください'],
+                ['issueBackground', 'fg-issueBackground', '背景・課題を入力してください'],
+                ['scopeIn', 'fg-scopeIn', '対象範囲（やること）を入力してください'],
+                ['doneCriteria', 'fg-doneCriteria', '完了条件を入力してください'],
+                ['techStack', 'fg-techStack', '技術スタックを入力してください'],
+                ['implApproach', 'fg-implApproach', '実装アプローチを入力してください'],
+                ['testPolicy', 'fg-testPolicy', 'テスト方針を入力してください'],
+            ];
+
+            let firstErrorEl = null;
+            let hasError = false;
+
+            requiredFields.forEach(([fieldId, fgId, msg]) => {
+                const val = document.getElementById(fieldId).value.trim();
+                if (!val) {
+                    hasError = true;
+                    const fg = document.getElementById(fgId);
+                    fg.classList.add('field-error');
+                    const span = document.createElement('span');
+                    span.className = 'field-error-msg';
+                    span.textContent = '⚠️ ' + msg;
+                    fg.appendChild(span);
+                    if (!firstErrorEl) firstErrorEl = fg;
+                }
+            });
+
+            // 選択された観点を取得
+            const checkedBoxes = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                .filter(cb => cb.id !== '分割-その他')
+                .map(cb => cb.value);
+
+            const isCustom = document.getElementById('分割-その他').checked;
+            const customConcept = document.getElementById('customConcept').value.trim();
+
+            let concepts = checkedBoxes;
+            if (isCustom && !customConcept) {
+                hasError = true;
+                const fg = document.getElementById('fg-concepts');
+                fg.classList.add('field-error');
+                const span = document.createElement('span');
+                span.className = 'field-error-msg';
+                span.textContent = '⚠️ カスタム観点を入力してください';
+                fg.appendChild(span);
+                if (!firstErrorEl) firstErrorEl = fg;
+            } else if (isCustom) {
+                concepts.push(customConcept);
+            }
+
+            if (concepts.length === 0) {
+                hasError = true;
+                const fg = document.getElementById('fg-concepts');
+                fg.classList.add('field-error');
+                if (!fg.querySelector('.field-error-msg')) {
+                    const span = document.createElement('span');
+                    span.className = 'field-error-msg';
+                    span.textContent = '⚠️ 細分化の観点を1つ以上選択してください';
+                    fg.appendChild(span);
+                }
+                if (!firstErrorEl) firstErrorEl = fg;
+            }
+
+            if (hasError) {
+                firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            const conceptSet = new Set(concepts);
+            const conceptText = concepts.join('、');
+            const customValue = isCustom ? customConcept : '';
+
+            const fallback = '未記入（必要に応じて補完してください）';
+
+            const toBulletList = (text, defaultLine) => {
+                if (!text) {
+                    return defaultLine;
+                }
+                return text
+                    .split('\n')
+                    .map(line => line.trim())
+                    .filter(Boolean)
+                    .map(line => `- ${line}`)
+                    .join('\n');
+            };
+
+            const currentSubIssuesList = toBulletList(currentSubIssues, '- #7 Sub-task: 機能A\n- #8 Sub-task: 機能C');
+            const expectedSubIssuesList = toBulletList(expectedSubIssues, '- Sub-task: 機能A（継続）\n- Sub-task: 機能B（新規）');
+
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const dateText = `${yyyy}-${mm}-${dd}`;
+            const compactDateText = `${yyyy}${mm}${dd}`;
+            const suggestedFilename = `issue-breakdown-issue-${issueNumber}-${compactDateText}.md`;
+
+            const executionPrompt = `${suggestedFilename}を読み込んで実行して`;
+
+            // issue-breakdown-template.md に準拠した完全なMD本文を生成
+            const template = `# Issue 細分化プロンプト テンプレート
+
+このファイルは、親Issueの情報が不足している場合でも、必要な補足情報を明示して Sub-issue を適切に分解するためのテンプレートです。
+
+---
+
+## 📝 使い方
+
+1. 下の「設定」を更新
+2. 「Copilot への指示（実行用）」をコピー
+3. 設定値を反映して Copilot チャットに貼り付け
+4. 生成されたコマンドを確認して実行
+
+---
+
+## ⚙️ 設定（ここを更新）
+
+\`\`\`yaml
+親Issue番号: "#${issueNumber}"
+
+細分化観点:
+- [${conceptSet.has('機能別分解') ? 'x' : ' '}] 機能別分解
+- [${conceptSet.has('フェーズ別分解') ? 'x' : ' '}] フェーズ別分解
+- [${conceptSet.has('優先度別分解') ? 'x' : ' '}] 優先度別分解
+- [${conceptSet.has('担当者別分解') ? 'x' : ' '}] 担当者別分解
+- [${isCustom ? 'x' : ' '}] カスタム分解
+カスタム観点: "${customValue}"
+
+# 親Issueに十分な情報がない場合に記入
+補足情報:
+  目的: "${issueGoal || ''}"
+  背景・課題: "${issueBackground || ''}"
+  対象範囲（やること）: "${scopeIn || ''}"
+  対象外（やらないこと）: "${scopeOut || ''}"
+  完了条件: "${doneCriteria || ''}"
+  制約・注意点: "${constraints || ''}"
+
+実装情報:
+  技術スタック: "${techStack}"
+  参照ファイル・関連コード: |
+${relatedFiles ? relatedFiles.split('\n').filter(Boolean).map(l => '    ' + l.trim()).join('\n') : '    （未記入）'}
+  実装アプローチ: "${implApproach || ''}"
+  テスト方針: "${testPolicy || ''}"
+\`\`\`
+
+---
+
+## 🎯 Copilot への指示（実行用）
+
+以下をコピーして Copilot に送信してください。
+
+\`\`\`text
+${executionPrompt}
+\`\`\`
+
+---
+
+## 📋 Sub-issue 本文の作成方針（Copilot 用）
+
+各 Sub-issue を GitHub CLI で作成する際、`--body` には以下をすべて含めてください。
+**Copilot が実装できる粒度**を意識し、各項目を具体的に記述してください。
+
+**本文フォーマット（各 Sub-issue 共通）:**
+\`\`\`
+親 Issue: #${issueNumber}
+
+## 目的
+（このタスクで達成すること）
+
+## 実装アプローチ
+技術スタック: ${techStack}
+（具体的な実装手順・技術選定の理由）
+
+## 参照ファイル・コード
+${relatedFiles ? relatedFiles.split('\n').filter(Boolean).map(l => '- ' + l.trim()).join('\n') : '- （実装に関連するファイルパスを記載）'}
+
+## テスト方針
+${testPolicy || '（何をどうテストするかを記載）'}
+
+## 完了条件
+（このタスクがDoneになる具体的な条件）
+\`\`\`
+
+**GitHub CLI コマンド形式（PowerShell）:**
+\`\`\`powershell
+& "C:\\Program Files\\GitHub CLI\\gh.exe" issue create --title "Sub-task: ..." --body "親 Issue: #${issueNumber}..."
+\`\`\`
+
+不足情報がある場合は推測せず、「要確認」として明示してください。
+
+細分化の見直し時は、次の流れで運用します。
+
+1. 現在の Sub-issue 一覧を取得
+
+\`\`\`powershell
+& "C:\Program Files\GitHub CLI\gh.exe" issue view ${issueNumber} --json number,title,body
+& "C:\Program Files\GitHub CLI\gh.exe" issue list --search "parent:#${issueNumber}" --limit 100
+\`\`\`
+
+2. 新しい期待リストを作成（設定を更新）
+3. Copilot に差分分析を依頼
+
+\`\`\`text
+親Issue: #${issueNumber}
+
+【現在の Sub-issue】
+${currentSubIssuesList}
+
+【新しい期待リスト】
+${expectedSubIssuesList}
+
+【補足情報】
+- 目的: ${issueGoal || '...'}
+- 完了条件: ${doneCriteria || '...'}
+
+【依頼】
+差分を分析して、以下を出力してください。
+1. 新規作成コマンド
+2. 更新コマンド（必要時）
+3. Close対象のコマンド（理由コメント付き）
+\`\`\`
+
+4. Close は必ず理由コメントを先に投稿
+
+\`\`\`powershell
+& "C:\Program Files\GitHub CLI\gh.exe" issue comment 8 --body "細分化見直しにより本Issueは統合対象となったためCloseします。理由: Issue #7 に統合"
+& "C:\Program Files\GitHub CLI\gh.exe" issue close 8
+\`\`\`
+
+---
+
+## ✅ Close理由コメントの雛形
+
+\`\`\`text
+細分化の見直しにより、本Issueはクローズします。
+
+【理由】
+- （例）Issue #7 に統合
+- （例）対象範囲外となったため
+- （例）優先度見直しで次フェーズへ移動
+
+【参照】
+- 親 Issue: #${issueNumber}
+- 代替/統合先: #7
+\`\`\`
+
+---
+
+作成日: ${dateText}
+用途: 親Issueの情報不足を補完しながら Sub-issue を生成・更新・整理する`;
+
+            // 出力を表示
+            document.getElementById('suggestedFilename').textContent = suggestedFilename;
+            document.getElementById('executionPrompt').textContent = executionPrompt;
+            document.getElementById('outputContent').textContent = template;
+            document.getElementById('outputSection').classList.add('active');
+
+            // ボタンテキスト変更（「コピー」状態をリセット）
+            const copyBtn = document.querySelector('.copy-btn');
+            copyBtn.textContent = '📋 コピー';
+            copyBtn.classList.remove('copied');
+        }
+
+        // コピー関数
+        function copyToClipboard() {
+            const content = document.getElementById('outputContent').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✅ コピーしました！';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 コピー';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                alert('コピーに失敗しました: ' + err);
+            });
+        }
+
+        function copyById(contentId, buttonId) {
+            const content = document.getElementById(contentId).textContent;
+            const btn = document.getElementById(buttonId);
+            navigator.clipboard.writeText(content).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '✅ コピーしました！';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                alert('コピーに失敗しました: ' + err);
+            });
+        }
+
+        // リセット関数
+        function clearForm() {
+            document.getElementById('issueNumber').value = '';
+            document.getElementById('issueGoal').value = '';
+            document.getElementById('issueBackground').value = '';
+            document.getElementById('scopeIn').value = '';
+            document.getElementById('scopeOut').value = '';
+            document.getElementById('doneCriteria').value = '';
+            document.getElementById('constraints').value = '';
+            document.getElementById('techStack').value = '';
+            document.getElementById('relatedFiles').value = '';
+            document.getElementById('implApproach').value = '';
+            document.getElementById('testPolicy').value = '';
+            document.getElementById('currentSubIssues').value = '';
+            document.getElementById('expectedSubIssues').value = '';
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.getElementById('customConcept').value = '';
+            document.getElementById('customInput').style.display = 'none';
+            document.getElementById('suggestedFilename').textContent = '';
+            document.getElementById('executionPrompt').textContent = '';
+            document.getElementById('outputSection').classList.remove('active');
+            document.getElementById('errorMessage').innerHTML = '';
+        }
+
+        // Enter キーで生成
+        document.getElementById('issueNumber').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                generatePrompt();
+            }
+        });
+
+        // localStorage 自動保存
+        const STORAGE_KEY = 'issueBreakdownForm';
+        const TEXT_FIELD_IDS = ['issueNumber', 'issueGoal', 'issueBackground', 'scopeIn', 'scopeOut', 'doneCriteria', 'constraints', 'techStack', 'relatedFiles', 'implApproach', 'testPolicy', 'currentSubIssues', 'expectedSubIssues', 'customConcept'];
+        const CHECKBOX_IDS = ['分割-機能別', '分割-フェーズ別', '分割-優先度別', '分割-担当者別', '分割-その他'];
+
+        function saveToStorage() {
+            const data = {};
+            TEXT_FIELD_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) data[id] = el.value;
+            });
+            CHECKBOX_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) data[id] = el.checked;
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadFromStorage() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            try {
+                const data = JSON.parse(raw);
+                TEXT_FIELD_IDS.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && data[id] !== undefined) el.value = data[id];
+                });
+                CHECKBOX_IDS.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && data[id] !== undefined) el.checked = data[id];
+                });
+                // カスタム観点の表示制御
+                const customCb = document.getElementById('分割-その他');
+                if (customCb && customCb.checked) {
+                    document.getElementById('customInput').style.display = 'block';
+                }
+            } catch (e) { /* 無視 */ }
+        }
+
+        // フォームの各フィールドにblurイベントで保存
+        TEXT_FIELD_IDS.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('blur', saveToStorage);
+        });
+        CHECKBOX_IDS.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', saveToStorage);
+        });
+
+        // ページ読み込み時に復元（スクリプトはbody末尾なので直接呼び出し）
+        loadFromStorage();
+
+        // clearForm に保存データ削除を追加（既存の clearForm 内で localStorage もクリア）
+        const _originalClear = clearForm;
+        clearForm = function () {
+            _originalClear();
+            localStorage.removeItem(STORAGE_KEY);
+        };
+    </script>
+</body>
+
+</html>
