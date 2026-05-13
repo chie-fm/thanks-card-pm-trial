@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Issue 作成ガイド - Copilot 初心者向け</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f5f5f5;
+            --surface2: #eeeeee;
+            --border: #e0e0e0;
+            --accent-gh: #0969da;
+            --accent-linear: #6366f1;
+            --accent-notion: #f59e0b;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --green: #059669;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Sans JP', sans-serif;
+            font-weight: 300;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+            padding: 100px 60px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero-tag {
+            font-family: 'Syne', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-gh);
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--text);
+            line-height: 1.1;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--accent-gh), var(--accent-linear));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.8;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            background: var(--accent-gh);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .hero-cta:hover {
+            background: #0860ca;
+        }
+
+        /* ── CONTAINER ── */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 60px;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 60px;
+            text-align: center;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ── METHODS GRID ── */
+        .methods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .method-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 40px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .method-card:hover {
+            border-color: var(--accent-gh);
+            box-shadow: 0 12px 32px rgba(9, 105, 218, 0.12);
+            transform: translateY(-4px);
+        }
+
+        .method-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+        }
+
+        .method-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .method-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .method-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .method-features li {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 10px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .method-features li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .method-cta {
+            display: inline-block;
+            background: var(--accent-gh);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .method-cta:hover {
+            background: #0860ca;
+        }
+
+        /* ── INFO SECTION ── */
+        .info-section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 60px;
+        }
+
+        .info-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .info-text:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ── FAQ ── */
+        .faq-section {
+            margin-bottom: 60px;
+        }
+
+        .faq-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 50px;
+            text-align: center;
+            color: var(--text);
+        }
+
+        .faq-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .faq-item {
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-gh);
+        }
+
+        .faq-question {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .faq-answer {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 40px 60px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 900px;
+            margin: 0 auto;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 60px 30px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .container {
+                padding: 40px 20px;
+            }
+
+            .methods-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-tag">GitHub Issue 作成ガイド</div>
+        <h1>Copilot で <span>Issue を作成</span></h1>
+        <p class="hero-sub">初心者向けの詳細な手順書。WEB 画面または CLI コマンドで、簡単に Issue を作成できます。</p>
+    </section>
+
+    <!-- METHODS SECTION -->
+    <div class="container">
+        <h2 class="section-title">2つの方法を選択</h2>
+        <p class="section-subtitle">あなたのやり方に合わせて、WEB 画面または CLI コマンドで Issue を作成できます。</p>
+
+        <div class="methods-grid">
+            <!-- WEB METHOD -->
+            <a href="web-method.html" class="method-card">
+                <div class="method-icon">🌐</div>
+                <h3 class="method-title">WEB 画面で作成</h3>
+                <p class="method-desc">GitHub の WEB 画面を使ってブラウザから Issue を作成します。直感的で初心者向け。</p>
+                <ul class="method-features">
+                    <li>ブラウザで直感的に操作</li>
+                    <li>ラベルやマイルストーンを簡単に設定</li>
+                    <li>UI が分かりやすい</li>
+                </ul>
+                <div class="method-cta">詳細な手順を見る →</div>
+            </a>
+
+            <!-- CLI METHOD -->
+            <a href="cli-method.html" class="method-card">
+                <div class="method-icon">⌨️</div>
+                <h3 class="method-title">CLI コマンドで作成</h3>
+                <p class="method-desc">GitHub CLI を使ってターミナルからコマンドで Issue を作成します。自動化に向いている。</p>
+                <ul class="method-features">
+                    <li>スクリプトで自動化できる</li>
+                    <li>複数の Issue を一括作成</li>
+                    <li>プログラム開発者向け</li>
+                </ul>
+                <div class="method-cta">詳細な手順を見る →</div>
+            </a>
+        </div>
+
+        <!-- INFO SECTION -->
+        <div class="info-section">
+            <h3 class="info-title">📌 始める前に確認すること</h3>
+            <p class="info-text">
+                <strong>✓ GitHub アカウント</strong>が必要です。まだない場合は https://github.com で作成してください。
+            </p>
+            <p class="info-text">
+                <strong>✓ リポジトリへのアクセス権</strong>が必要です。Issue を作成するリポジトリにアクセス可能であることを確認してください。
+            </p>
+            <p class="info-text">
+                <strong>✓ Copilot</strong>の指示に従うだけで大丈夫です。各手順書では、Copilot にどう指示すれば良いかを詳しく説明しています。
+            </p>
+        </div>
+    </div>
+
+    <!-- FAQ SECTION -->
+    <section class="container faq-section">
+        <h2 class="faq-title">よくある質問</h2>
+
+        <div class="faq-items">
+            <div class="faq-item">
+                <div class="faq-question">Q. どちらの方法を選べば良い？</div>
+                <div class="faq-answer">
+                    初心者の方は「WEB 画面で作成」をお勧めします。UI が分かりやすく、直感的に操作できます。複数の Issue を頻繁に作成する場合は、CLI がおすすめです。
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Q. Copilot がない場合は？</div>
+                <div class="faq-answer">
+                    このガイドは Copilot の指示機能を前提としています。Copilot がない場合は、手順書に書かれた操作を自分で行ってください。
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Q. 途中でエラーが出た場合は？</div>
+                <div class="faq-answer">
+                    各手順書の「トラブルシューティング」セクションを確認してください。よくあるエラーと解決方法を記載しています。
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Q. Issue を削除したい場合は？</div>
+                <div class="faq-answer">
+                    WEB 画面：Issue の詳細ページで「Delete」をクリック。CLI：gh issue delete [番号] --yes を実行。
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Q. 複数の Issue を一括作成できる？</div>
+                <div class="faq-answer">
+                    はい。特に CLI は複数の Issue 作成に向いています。各手順書の「応用」セクションを参照してください。
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Q. Issue にラベルやマイルストーンを付けたい</div>
+                <div class="faq-answer">
+                    WEB 画面：作成後、Issue の詳細ページで設定できます。CLI：--label や --milestone オプションで設定可能です。
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <p>GitHub Issue 作成ガイド - 初心者向け Copilot 手順書</p>
+        </div>
+    </footer>
+</body>
+
+</html>
