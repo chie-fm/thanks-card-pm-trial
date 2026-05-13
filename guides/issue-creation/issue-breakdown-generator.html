@@ -717,7 +717,7 @@ ${executionPrompt}
 
 ## 📋 Sub-issue 本文の作成方針（Copilot 用）
 
-各 Sub-issue を GitHub CLI で作成する際、`--body` には以下をすべて含めてください。
+各 Sub-issue を GitHub CLI で作成する際、\`--body\` には以下をすべて含めてください。
 **Copilot が実装できる粒度**を意識し、各項目を具体的に記述してください。
 
 **本文フォーマット（各 Sub-issue 共通）:**
@@ -743,8 +743,15 @@ ${testPolicy || '（何をどうテストするかを記載）'}
 
 **GitHub CLI コマンド形式（PowerShell）:**
 \`\`\`powershell
-& "C:\\Program Files\\GitHub CLI\\gh.exe" issue create --title "Sub-task: ..." --body "親 Issue: #${issueNumber}..."
+$gh = "C:\\Program Files\\GitHub CLI\\gh.exe"
+$parentId = (& $gh issue view ${issueNumber} --json id --jq .id)
+$childUrl = (& $gh issue create --title "Sub-task: ..." --body "親 Issue: #${issueNumber}...")
+$childNumber = ($childUrl -split '/')[-1]
+$childId = (& $gh issue view $childNumber --json id --jq .id)
+& $gh api graphql -f query='mutation($issueId:ID!,$subIssueId:ID!){ addSubIssue(input:{issueId:$issueId,subIssueId:$subIssueId}) { issue { number } subIssue { number } } }' -f issueId=$parentId -f subIssueId=$childId
 \`\`\`
+
+※ \`issue create\` だけでは親子関係になりません。必ず \`addSubIssue\` で親Issueに紐付けてください。
 
 不足情報がある場合は推測せず、「要確認」として明示してください。
 
@@ -753,8 +760,8 @@ ${testPolicy || '（何をどうテストするかを記載）'}
 1. 現在の Sub-issue 一覧を取得
 
 \`\`\`powershell
-& "C:\Program Files\GitHub CLI\gh.exe" issue view ${issueNumber} --json number,title,body
-& "C:\Program Files\GitHub CLI\gh.exe" issue list --search "parent:#${issueNumber}" --limit 100
+& "C:\\Program Files\\GitHub CLI\\gh.exe" issue view ${issueNumber} --json number,title,body
+& "C:\\Program Files\\GitHub CLI\\gh.exe" issue list --search "parent:#${issueNumber}" --limit 100
 \`\`\`
 
 2. 新しい期待リストを作成（設定を更新）
@@ -783,8 +790,8 @@ ${expectedSubIssuesList}
 4. Close は必ず理由コメントを先に投稿
 
 \`\`\`powershell
-& "C:\Program Files\GitHub CLI\gh.exe" issue comment 8 --body "細分化見直しにより本Issueは統合対象となったためCloseします。理由: Issue #7 に統合"
-& "C:\Program Files\GitHub CLI\gh.exe" issue close 8
+& "C:\\Program Files\\GitHub CLI\\gh.exe" issue comment ${issueNumber} --body "細分化見直しにより本Issueは統合対象となったためCloseします。理由: Issue #7 に統合"
+& "C:\\Program Files\\GitHub CLI\\gh.exe" issue close ${issueNumber}
 \`\`\`
 
 ---

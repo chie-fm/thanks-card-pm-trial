@@ -86,8 +86,15 @@
 
 **GitHub CLI コマンド形式（PowerShell）:**
 ```powershell
-& "C:\Program Files\GitHub CLI\gh.exe" issue create --title "Sub-task: ..." --body "親 Issue: #6..."
+$gh = "C:\Program Files\GitHub CLI\gh.exe"
+$parentId = (& $gh issue view 6 --json id --jq .id)
+$childUrl = (& $gh issue create --title "Sub-task: ..." --body "親 Issue: #6...")
+$childNumber = ($childUrl -split '/')[-1]
+$childId = (& $gh issue view $childNumber --json id --jq .id)
+& $gh api graphql -f query='mutation($issueId:ID!,$subIssueId:ID!){ addSubIssue(input:{issueId:$issueId,subIssueId:$subIssueId}) { issue { number } subIssue { number } } }' -f issueId=$parentId -f subIssueId=$childId
 ```
+
+※ `issue create` だけでは親子関係になりません。必ず `addSubIssue` で親Issueに紐付けてください。
 
 不足情報がある場合は推測せず、「要確認」として明示してください。
 
